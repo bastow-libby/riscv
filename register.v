@@ -1,12 +1,24 @@
-module register(do1, do2, A2, we, din);
+module register(a0, a1, wr, we, din, clk, rst);
+input [31:0] din;
+input [4:0] wr;
+input clk, rst, we;
+
+output [4:0] a0;
+output [4:0] a1;
+
+wire [31:0] r[0:31];
 
 genvar i;
 generate
 
   for(i = 0; i < 32; i = i + 1) begin
-    dff rgstr(.q(dout[i]), .d(we ? din[i] : dout[i]), .clk(clk), .rst(rst));
+    register32 rgstr(.din(din), .we((|(wr^i)&we) ? 1'b0 : 1'b1), .dout(r[i]), .clk(clk), .rst(rst));
   end
 endgenerate
+
+
+assign q0 = r[a0];
+assign q1 = r[a1];
 
 endmodule
 
