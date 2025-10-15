@@ -92,6 +92,27 @@ R5
 !i113 1
 R6
 R7
+vdecode
+!s110 1760556229
+!i10b 1
+!s100 TfJ3Pn>hRP;La;FM5ORHa0
+IP41]:_T3Khh8NDKZFj=Si1
+R1
+R2
+w1760556181
+8C:/General/Verilog Projects/riscv/decode.v
+FC:/General/Verilog Projects/riscv/decode.v
+L0 6
+R4
+r1
+!s85 0
+31
+!s108 1760556229.000000
+!s107 define.vh|C:/General/Verilog Projects/riscv/decode.v|
+!s90 -reportprogress|300|-work|work|-stats=none|C:/General/Verilog Projects/riscv/decode.v|
+!i113 1
+R6
+R7
 vdff
 R0
 !i10b 1
