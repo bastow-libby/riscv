@@ -1,8 +1,9 @@
 `timescale 1us/100ns
 //Attempt at ALU using case statements
 module alu(
-input [31:0] a,b,                   
+input [31:0] a,b,   // change to rs1 rs2?                 
 input [3:0] func,// ALU Selection
+input [31:0] imm, // Immediate value
 output [31:0] out);
 
 
@@ -15,67 +16,36 @@ wire [31:0] add_result;
 wire cout;
 adder32 alu_adder(.A(a), .B(b), .Cin(1'b0), .S(add_result), .Cout(cout));
 
+// TODO: Need to grab correct input for rs1, rs2, rd, etc + Output to correct locations.
+// pls test bench this libby - dan
 always @(*) begin
 	case(func)
-		4'b0000: begin
-			//adder
-			
+		// R-Type Instructions - 10 Instructions - 0000 -> 1010
+		4'b0000: begin // ADD
 			result = add_result;
 			end
 		
-        	4'b0001: begin
-			//subtracter
+        	4'b0001: begin // SUB
            		result = a - b;
 			end
 
-        	4'b0100: begin
-			// logic shift left
-           		result = a<<1;
+		4'b0010: begin // AND
+			result = a & b;
 			end
 
-         	4'b0101: begin
-			// logical shift right
-           		result = a>>1;
+		4'b0011: begin // OR
+			result = a | b;
 			end
 
-         	4'b0110: begin 
-			// ROL
-           		result = {a[30:0],a[31]};
+		4'b0100: begin // XOR
+			result = a ^ b;
 			end
 
-         	4'b0111: begin
-			// ROR
-           		result = {a[0],a[30:1]};
+		// I-Type Instructions - a lot idk
+		// ToDo: Actually grab the immediate correctly
+		4'b1011: begin // ADDI
+			result = a - imm;
 			end
-
-          	4'b1000: begin
-			//and
-           		result = a & b;
-			end
-
-          	4'b1001: begin
-			//or
-           		result = a | b;
-			end
-
-          	4'b1010: begin
-			//xor 
-           		result = a ^ b;
-			end
-
-          	4'b1011: begin
-			//nor
-           		result = ~(a | b);
-			end
-
-          	4'b1100: begin
-			//nand 
-           		result = ~(a & b);
-			end
-          	4'b1101: begin
-			//xnor
-           		result = ~(a ^ b);
-			end 
 
 		default: begin
 			
