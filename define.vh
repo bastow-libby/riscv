@@ -27,10 +27,11 @@
 // ------------------------------------------
 // funct3 field
 // ------------------------------------------
-`define FUNCT3_ADD_SUB      3'b000
+`define FUNCT3_ADD_SUB  3'b000
 `define FUNCT3_AND      3'b111
 `define FUNCT3_OR       3'b110
-`define FUNCT3_ANDI     3'b111
+`define FUNCT3_XOR      3'b100
+`define FUNCT3_ADDI     3'b000
 
 // ------------------------------------------
 // funct7 field - for R type instructions
@@ -39,6 +40,7 @@
 `define FUNCT7_SUB      7'b0100000
 `define FUNCT7_AND      7'b0000000
 `define FUNCT7_OR       7'b0000000
+`define FUNCT7_XOR      7'b0000000
 
 // ------------------------------------------
 // ALU op codes
@@ -47,5 +49,7 @@
 `define ALU_SUB         4'b0001
 `define ALU_AND         4'b0010
 `define ALU_OR          4'b0011
+`define ALU_XOR         4'b0100
+`define ALU_ADDI        4'b1011
 
 `endif
