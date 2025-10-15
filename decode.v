@@ -15,7 +15,7 @@ module decode (
     output reg [3:0] alu_op      // alu control signal
 );
 
-    always @(*) begin
+    always @ (*) begin
         opcode = instruction[6:0];
         rd     = instruction[11:7];
         funct3 = instruction[14:12];

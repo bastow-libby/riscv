@@ -1,0 +1,5 @@
+*.bak
+*.vh.bak
+/work/*
+transcript
+define.vh.bak
