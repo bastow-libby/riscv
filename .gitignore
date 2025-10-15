@@ -1,0 +1,7 @@
+# local specific files
+transcript
+*.mpf
+*.mti
+*.bak
+*.cr.mti
+*.mpf
