@@ -40,9 +40,10 @@ module decode (
                     `FUNCT3_OR:		alu_op = `ALU_OR;
 					default:		alu_op = 4'bxxxx;
                 endcase
+			end
             // I-type instructions
 			`OPCODE_I_TYPE: begin
-				imm[11:0] = imm[11:0] | inst_encoding[31:20] // DOES THIS WORK?
+				imm[11:0] = imm[11:0] | inst_encoding[31:20]; // DOES THIS WORK?
 				case (funct3)
 					`FUNCT3_ADDI:	alu_op = `ALU_ADDI;
 					default:		alu_op = 4'bxxxx;
