@@ -15,7 +15,7 @@
 // U-Type: Contains special opcode
 // J-Type: Contains special opcode
 // ------------------------------------------
-`define OPCODE_R_TYPE   7'b0110011
+`define OPCODE_R_TYPE   7'b0110011 // Only the first 5 bits are relevant for all of these
 `define OPCODE_I_TYPE   7'b0010011
 `define OPCODE_SW       7'b0100011
 `define OPCODE_LW       7'b0000011

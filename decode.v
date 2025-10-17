@@ -1,6 +1,8 @@
 `timescale 1us/100ns
 `include "define.vh"
 
+// TODO: Add write enable?
+
 module decode (
     input  [31:0] inst_encoding,   // instruction bits that are encoded
     output reg [6:0] opcode, // outputs to be sent out to each module
@@ -26,8 +28,8 @@ module decode (
         // NOP code
         alu_op = 4'b0000;
 
+        // R&I-Type Instructions (ALU Opcode selection)
         case (opcode)
-            // R-type instructions
             `OPCODE_R_TYPE: begin
                 case (funct3)
                     `FUNCT3_ADD_SUB: begin
@@ -48,12 +50,26 @@ module decode (
                     `FUNCT3_ADDI:	alu_op = `ALU_ADDI;
                     default:		alu_op = 4'bxxxx;
                 endcase
-            // S-type instructions
-            // B-type instructions
-            // U-type instructions?
-            // J-type instructions
             end
         endcase
+
+        // Immediate-Value (Not utilized by R-Type Instructions)
+        case (opcode)
+            `OPCODE_JAL: begin
+                imm =       {{11{inst_encoding[31]}}, inst_encoding[31], inst_encoding[19:12], inst_encoding[20], inst_encoding[30:25], inst_encoding[24:21], 1'b0};
+            end
+            default: imm =  {{20{inst_encoding[31]}}, inst_encoding[31:20]};
+        endcase
+
+        // Register Writeback
+        case (opcode)
+            // Add other opcodes here that need writeback
+            `OPCODE_LUI, `OPCODE_JAL: begin
+                writeback = 1'b1;
+            end
+            default: writeback = 1'b0;
+        endcase
+
     end
 
 endmodule
