@@ -1,9 +1,10 @@
 module barrel_shifter(
-input [31:0] in, 
-input shift_amt,
-input [1:0] shift_code, 
-output [31:0] out);
-
+    input [31:0] in, 
+    input shift_amt,
+    input [1:0] shift_code, 
+    output [31:0] out
+);
+// TODO: Is this thing functional...
 //if i want to incorporate more types of shifts, structure like alu
 
 assign out = in >> shift_amt;
