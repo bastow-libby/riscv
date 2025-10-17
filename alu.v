@@ -1,4 +1,6 @@
 `timescale 1us/100ns
+`include "define.vh"
+
 //Attempt at ALU using case statements
 module alu(
 input [31:0] a,b,   // change to rs1 rs2?                 
@@ -20,31 +22,31 @@ adder32 alu_adder(.A(a), .B(b), .Cin(1'b0), .S(add_result), .Cout(cout));
 // pls test bench this libby - dan
 always @(*) begin
     case(func)
-        // R-Type Instructions - 10 Instructions - 0000 -> 1010
-        4'b0000: begin // ADD
+        // R-Type Instructions
+        `ALU_ADD: begin // ADD
             result = add_result;
             end
         
-        4'b0001: begin // SUB
+        `ALU_SUB: begin // SUB
             result = a - b;
             end
 
-        4'b0010: begin // AND
+        `ALU_AND: begin // AND
             result = a & b;
             end
 
-        4'b0011: begin // OR
+        `ALU_OR: begin // OR
             result = a | b;
             end
 
-        4'b0100: begin // XOR
+        `ALU_XOR: begin // XOR
             result = a ^ b;
             end
 
-        // I-Type Instructions - a lot idk
+        // I-Type Instructions
         // ToDo: Actually grab the immediate correctly
-        4'b1011: begin // ADDI
-            result = a - imm;
+        `ALU_ADDI: begin // ADDI
+            result = a + imm;
             end
 
         default: begin
