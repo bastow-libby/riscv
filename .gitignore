@@ -5,4 +5,5 @@ transcript
 *.bak
 *.cr.mti
 *.mpf
+.wlf
 work/
