@@ -1,58 +1,9 @@
-{C:/General/Verilog Projects/riscv/register.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/register.v}
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module register
-
-Top level modules:
-	register
-
-} {} {}} {C:/General/Verilog Projects/riscv/memory2c.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/memory2c.v}
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module memory2c
-
-Top level modules:
-	memory2c
-
-} {} {}} {C:/General/Verilog Projects/riscv/dff.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/dff.v}
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module dff
-
-Top level modules:
-	dff
-
-} {} {}} {C:/General/Verilog Projects/riscv/alu.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/alu.v}
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module alu
-
-Top level modules:
-	alu
-
-} {} {}} {C:/General/Verilog Projects/riscv/orgate.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/orgate.v}
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module orgate
-
-Top level modules:
-	orgate
-
-} {} {}} {C:/General/Verilog Projects/riscv/fulladder.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/fulladder.v}
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module fulladder
-
-Top level modules:
-	fulladder
-
-} {} {}} {C:/General/Verilog Projects/riscv/riscv_tb.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/riscv_tb.v}
+{C:/General/Verilog Projects/riscv/riscv_tb.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/riscv_tb.v}
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
 -- Compiling module riscv_tb
 
 Top level modules:
 	riscv_tb
-
-} {} {}} {C:/General/Verilog Projects/riscv/barrel_shifter.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/barrel_shifter.v}
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module barrel_shifter
-
-Top level modules:
-	barrel_shifter
 
 } {} {}} {C:/General/Verilog Projects/riscv/adder32.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/adder32.v}
 Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
@@ -60,33 +11,5 @@ Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  
 
 Top level modules:
 	adder32
-
-} {} {}} {C:/General/Verilog Projects/riscv/riscv.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/riscv.v}
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module riscv
-
-Top level modules:
-	riscv
-
-} {} {}} {C:/General/Verilog Projects/riscv/genadder.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/genadder.v}
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module genadder
-
-Top level modules:
-	genadder
-
-} {} {}} {C:/General/Verilog Projects/riscv/register32.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/register32.v}
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module register32
-
-Top level modules:
-	register32
-
-} {} {}} {C:/General/Verilog Projects/riscv/toplevel.v} {1 {vlog -work work -stats=none {C:/General/Verilog Projects/riscv/toplevel.v}
-Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
--- Compiling module toplevel
-
-Top level modules:
-	toplevel
 
 } {} {}}
