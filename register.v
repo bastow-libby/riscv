@@ -11,9 +11,9 @@ wire [31:0] r[0:31];
 genvar i;
 generate
 
-  for(i = 0; i < 32; i = i + 1) begin
-    register32 rgstr(.din(din), .we((|(wr^i)&we) ? 1'b0 : 1'b1), .dout(r[i]), .clk(clk), .rst(rst));
-  end
+    for(i = 0; i < 32; i = i + 1) begin
+        register32 rgstr(.din(din), .we((|(wr^i)&we) ? 1'b0 : 1'b1), .dout(r[i]), .clk(clk), .rst(rst));
+    end
 endgenerate
 
 

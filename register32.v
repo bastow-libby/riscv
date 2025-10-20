@@ -9,9 +9,9 @@ genvar i;
 
 generate
 
-  for(i = 0; i < 32; i = i + 1) begin
-    dff U (.q(dout[i]), .d(we ? din[i] : dout[i]), .clk(clk), .rst(rst));
-  end
+    for(i = 0; i < 32; i = i + 1) begin
+        dff U (.q(dout[i]), .d(we ? din[i] : dout[i]), .clk(clk), .rst(rst));
+    end
 
 endgenerate
 

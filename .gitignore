@@ -1,5 +1,8 @@
-*.bak
-*.vh.bak
-/work/*
+# local specific files
 transcript
-define.vh.bak
+*.mpf
+*.mti
+*.bak
+*.cr.mti
+*.mpf
+work/
