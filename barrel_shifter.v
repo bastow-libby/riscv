@@ -1,10 +1,20 @@
+`timescale 1us/100ns
 module barrel_shifter(
+<<<<<<< HEAD
+
+input [31:0] in, 
+input shift_amt,
+input [1:0] shift_code, 
+output [31:0] out);
+
+=======
     input [31:0] in, 
     input shift_amt,
     input [1:0] shift_code, 
     output [31:0] out
 );
 // TODO: Is this thing functional...
+>>>>>>> origin/main
 //if i want to incorporate more types of shifts, structure like alu
 
 assign out = in >> shift_amt;

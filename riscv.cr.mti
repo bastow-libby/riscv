@@ -1,0 +1,78 @@
+/home/elizabeth-bastow/libby_computer/register32.v {1 {vlog -work work -stats=none /home/elizabeth-bastow/libby_computer/register32.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module register32
+
+Top level modules:
+	register32
+
+} {} {}} /home/elizabeth-bastow/libby_computer/genadder.v {1 {vlog -work work -stats=none /home/elizabeth-bastow/libby_computer/genadder.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module genadder
+
+Top level modules:
+	genadder
+
+} {} {}} /home/elizabeth-bastow/libby_computer/toplevel.v {1 {vlog -work work -stats=none /home/elizabeth-bastow/libby_computer/toplevel.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module toplevel
+
+Top level modules:
+	toplevel
+
+} {} {}} /home/elizabeth-bastow/libby_computer/register.v {1 {vlog -work work -stats=none /home/elizabeth-bastow/libby_computer/register.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module register
+
+Top level modules:
+	register
+
+} {} {}} /home/elizabeth-bastow/libby_computer/memory2c.v {1 {vlog -work work -stats=none /home/elizabeth-bastow/libby_computer/memory2c.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module memory2c
+
+Top level modules:
+	memory2c
+
+} {} {}} /home/modelsim/dff.v {1 {vlog -work work -stats=none /home/modelsim/dff.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module dff
+
+Top level modules:
+	dff
+
+} {} {}} /home/elizabeth-bastow/libby_computer/alu.v {1 {vlog -work work -stats=none /home/elizabeth-bastow/libby_computer/alu.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module alu
+
+Top level modules:
+	alu
+
+} {} {}} /home/elizabeth-bastow/libby_computer/orgate.v {1 {vlog -work work -stats=none /home/elizabeth-bastow/libby_computer/orgate.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module orgate
+
+Top level modules:
+	orgate
+
+} {} {}} /home/elizabeth-bastow/libby_computer/fulladder.v {1 {vlog -work work -stats=none /home/elizabeth-bastow/libby_computer/fulladder.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module fulladder
+
+Top level modules:
+	fulladder
+
+} {} {}} /home/elizabeth-bastow/libby_computer/riscv_tb.v {1 {vlog -work work -stats=none /home/elizabeth-bastow/libby_computer/riscv_tb.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module riscv_tb
+
+Top level modules:
+	riscv_tb
+
+} {} {}} /home/elizabeth-bastow/libby_computer/adder32.v {1 {vlog -work work -stats=none /home/elizabeth-bastow/libby_computer/adder32.v
+Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+-- Compiling module adder32
+
+Top level modules:
+	adder32
+
+} {} {}}
