@@ -11,9 +11,9 @@ genvar i;
 
 generate
 
-  for(i = 0; i < 32; i = i + 1) begin
-    fulladder U (.a(A[i]), .b(B[i]), .cin(internal_carry[i]), .s(S[i]), .cout(internal_carry[i+1]));
-  end
+    for(i = 0; i < 32; i = i + 1) begin
+        fulladder U (.a(A[i]), .b(B[i]), .cin(internal_carry[i]), .s(S[i]), .cout(internal_carry[i+1]));
+    end
 
 endgenerate
 
