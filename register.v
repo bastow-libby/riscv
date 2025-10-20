@@ -1,10 +1,12 @@
-module register(a0, a1, wr, we, din, clk, rst);
+module register(a0, a1, wr, we, din, clk, rst, q0, q1);
 input [31:0] din;
 input [4:0] wr;
 input clk, rst, we;
 
-output [4:0] a0;
-output [4:0] a1;
+input [4:0] a0;
+input [4:0] a1;
+
+output [31:0] q0,q1;
 
 wire [31:0] r[0:31];
 

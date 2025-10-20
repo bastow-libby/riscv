@@ -5,8 +5,8 @@
 module alu(
 input [31:0] a,b,   // change to rs1 rs2?                 
 input [3:0] func,// ALU Selection
-input [31:0] imm, // Immediate value
-output [31:0] out);
+output [31:0] out
+);
 
 
 reg [31:0] result;
@@ -15,7 +15,7 @@ assign out = result;
 //I'm sort of worried abt the cases not being complete...
 //adder 
 wire [31:0] add_result;
-wire cout;
+wire [31:0] cout;
 adder32 alu_adder(.A(a), .B(b), .Cin(1'b0), .S(add_result), .Cout(cout));
 
 // TODO: Need to grab correct input for rs1, rs2, rd, etc + Output to correct locations.
@@ -46,9 +46,8 @@ always @(*) begin
         // I-Type Instructions
         // ToDo: Actually grab the immediate correctly
         `ALU_ADDI: begin // ADDI
-            result = a + imm;
+            result = a + b;
             end
-
         default: begin
             result = 32'h00000000;
         end

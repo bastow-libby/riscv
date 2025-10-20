@@ -13,6 +13,7 @@ module decode (
     output reg [4:0] rd,
     output reg [31:0] imm,
     output reg writeback,
+    output reg we,
     output reg [3:0] alu_op      // alu control signal,
 );
 
@@ -45,7 +46,6 @@ module decode (
             end
             // I-type instructions
             `OPCODE_I_TYPE: begin
-                imm[11:0] = imm[11:0] | inst_encoding[31:20]; // DOES THIS WORK?
                 case (funct3)
                     `FUNCT3_ADDI:	alu_op = `ALU_ADDI;
                     default:		alu_op = 4'bxxxx;
@@ -58,6 +58,9 @@ module decode (
             `OPCODE_JAL: begin
                 imm =       {{11{inst_encoding[31]}}, inst_encoding[31], inst_encoding[19:12], inst_encoding[20], inst_encoding[30:25], inst_encoding[24:21], 1'b0};
             end
+            `OPCODE_I_TYPE: begin
+                imm =       {{20{inst_encoding[31]}}, inst_encoding[31:20]};
+            end
             default: imm =  {{20{inst_encoding[31]}}, inst_encoding[31:20]};
         endcase
 
@@ -68,6 +71,15 @@ module decode (
                 writeback = 1'b1;
             end
             default: writeback = 1'b0;
+        endcase
+
+        // Write Enable TODO: FIX
+        case (opcode)
+            // Add other opcodes here that need we
+            `OPCODE_I_TYPE: begin
+                we = 1'b1;
+            end
+            default: we = 1'b0;
         endcase
 
     end
