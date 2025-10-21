@@ -51,7 +51,6 @@ module decode (
             end
             `OPCODE_LUI: begin // cheating for this one
                 alu_op = `ALU_ADDI;
-                opcode = `OPCODE_R_TYPE;
                 rs1 = 5'b00000;
             end
         endcase
@@ -78,10 +77,9 @@ module decode (
             end
             default: writeback = 1'b0;
         endcase
-
+        // Write Enable
         case (opcode)
-            // Add other opcodes here that need we
-            `OPCODE_I_TYPE, `OPCODE_LUI: begin
+            `OPCODE_R_TYPE, `OPCODE_I_TYPE, `OPCODE_LUI: begin
                 we = 1'b1;
             end
             default: we = 1'b0;
