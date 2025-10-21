@@ -1,8 +1,6 @@
 `timescale 1us/100ns
 `include "define.vh"
 
-// TODO: Add write enable?
-
 module decode (
     input  [31:0] inst_encoding,   // instruction bits that are encoded
     output reg [6:0] opcode, // outputs to be sent out to each module
@@ -51,6 +49,11 @@ module decode (
                     default:		alu_op = 4'bxxxx;
                 endcase
             end
+            `OPCODE_LUI: begin // cheating for this one
+                alu_op = `ALU_ADDI;
+                opcode = `OPCODE_R_TYPE;
+                rs1 = 5'b00000;
+            end
         endcase
 
         // Immediate-Value (Not utilized by R-Type Instructions)
@@ -60,6 +63,9 @@ module decode (
             end
             `OPCODE_I_TYPE: begin
                 imm =       {{20{inst_encoding[31]}}, inst_encoding[31:20]};
+            end
+            `OPCODE_LUI: begin // Cheating a bit for this instruction
+                imm =       {{inst_encoding[31:12]}, 12'b0};
             end
             default: imm =  {{20{inst_encoding[31]}}, inst_encoding[31:20]};
         endcase
@@ -73,10 +79,9 @@ module decode (
             default: writeback = 1'b0;
         endcase
 
-        // Write Enable TODO: FIX
         case (opcode)
             // Add other opcodes here that need we
-            `OPCODE_I_TYPE: begin
+            `OPCODE_I_TYPE, `OPCODE_LUI: begin
                 we = 1'b1;
             end
             default: we = 1'b0;
