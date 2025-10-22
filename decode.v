@@ -55,15 +55,27 @@ module decode (
                 alu_op = `ALU_ADDI;
                 rs1 = 5'b00000;
             end
+            // J-Type
             `OPCODE_JAL: begin
                 is_jump = 1'b1;
                 alu_op = 4'b0000; // JAL doesn't use ALU
             end
-	    `OPCODE_JALR: begin
-		is_jump = 1'b1;
-		alu_op = 4'b0000;
-	    end
-
+            `OPCODE_JALR: begin
+                is_jump = 1'b1;
+                alu_op = 4'b0000;
+            end
+            // S-Type
+            `OPCODE_S_TYPE: begin
+                case (funct3)
+                    `FUNCT3_SW:     alu_op = `ALU_ADDI;
+                endcase
+            end
+            // L-Type
+            `OPCODE_L_TYPE: begin
+                case (funct3)
+                    `FUNCT3_LW:     alu_op = `ALU_ADDI;
+                endcase
+            end
         endcase
 
         // Immediate-Value (Not utilized by R-Type Instructions)
@@ -73,16 +85,18 @@ module decode (
                 // Result: imm[20:0] = {inst[31], inst[19:12], inst[20], inst[30:21], 1'b0}
                 imm =       {{11{inst_encoding[31]}}, inst_encoding[31], inst_encoding[19:12], inst_encoding[20], inst_encoding[30:21], 1'b0};
             end
-            `OPCODE_I_TYPE: begin
+            `OPCODE_I_TYPE, `OPCODE_L_TYPE: begin
                 imm =       {{20{inst_encoding[31]}}, inst_encoding[31:20]};
             end
             `OPCODE_LUI: begin // Cheating a bit for this instruction
                 imm =       {{inst_encoding[31:12]}, 12'b0};
             end
-	    `OPCODE_JALR: begin
-		imm =       {{20{inst_encoding[31]}}, inst_encoding[31:20]};
-	     end
-            default: imm =  {{20{inst_encoding[31]}}, inst_encoding[31:20]};
+            `OPCODE_JALR: begin
+                imm =       {{20{inst_encoding[31]}}, inst_encoding[31:20]};
+            end
+            `OPCODE_S_TYPE: begin
+                imm =       {{20{inst_encoding[31]}}, inst_encoding[31:25], inst_encoding[11:7]};
+            end
         endcase
 
         // Register Writeback
