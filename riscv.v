@@ -40,8 +40,8 @@ memory2c imem(.data_out(inst_encoding), .data_in(32'h0), .addr(curr_pc), .enable
 decode decoder(.inst_encoding(inst_encoding), .opcode(opcode), .funct3(funct3), .funct7(funct7), .rs1(rs1), .rs2(rs2), .rd(rd), .imm(imm), .writeback(writeback), .we(we), .alu_op(alu_op), .is_jump(is_jump));
 
 // Writeback data mux: if JAL, writeback PC+4, else writeback ALU output
-assign writeback_data = opcode == 7'b1101111 ? pc_plus_4 : alu_out;
-
+//assign writeback_data = opcode == 7'b1101111 ? pc_plus_4 : alu_out;
+tripple_mux writeback_mux(.plus_4(alu_out), .jump(pc_plus_4), .ra(reg_1_data), .sel(opcode), .out(writeback_data));
 // read registers for R1 and r2
 register registr(.a0(rs1), .a1(rs2), .wr(rd), .we(we), .din(writeback_data), .clk(clk), .rst(rst), .q0(reg_data_1), .q1(reg_data_2));
 alu_mux mux1(.r2(reg_data_2), .imm(imm), .sel(opcode), .out(alu_in));
