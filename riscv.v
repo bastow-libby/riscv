@@ -32,16 +32,16 @@ genadder pc_imm_adder(.A(curr_pc), .B(imm), .S(pc_plus_imm), .Cin(1'b0), .Cout()
 // PC mux: if JAL, next PC = PC + imm, else next PC = PC + 4
 //Libby, change to include jalr (ra) also
 //might need to make tripple mux
-tripple_mux pc_mux(.plus_4(pc_plus_4), .jump(pc_plus_imm), .ra(reg_data_1), .sel(opcode), .out(next_pc));
-
+assign next_pc = is_jump ? pc_plus_imm : pc_plus_4;
 
 register32 pcmodule(.din(next_pc), .we(1'b1), .dout(curr_pc), .clk(clk), .rst(rst));
 memory2c imem(.data_out(inst_encoding), .data_in(32'h0), .addr(curr_pc), .enable(1'b1), .wr(1'b0), .createdump(1'b0), .clk(clk), .rst(rst));
 decode decoder(.inst_encoding(inst_encoding), .opcode(opcode), .funct3(funct3), .funct7(funct7), .rs1(rs1), .rs2(rs2), .rd(rd), .imm(imm), .writeback(writeback), .we(we), .alu_op(alu_op), .is_jump(is_jump));
 
 // Writeback data mux: if JAL, writeback PC+4, else writeback ALU output
-//assign writeback_data = opcode == 7'b1101111 ? pc_plus_4 : alu_out;
-tripple_mux writeback_mux(.plus_4(alu_out), .jump(pc_plus_4), .ra(reg_1_data), .sel(opcode), .out(writeback_data));
+assign writeback_data = is_jump ? pc_plus_4 : alu_out;
+
+
 // read registers for R1 and r2
 register registr(.a0(rs1), .a1(rs2), .wr(rd), .we(we), .din(writeback_data), .clk(clk), .rst(rst), .q0(reg_data_1), .q1(reg_data_2));
 alu_mux mux1(.r2(reg_data_2), .imm(imm), .sel(opcode), .out(alu_in));

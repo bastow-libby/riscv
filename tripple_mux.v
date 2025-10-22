@@ -8,10 +8,10 @@ output reg [31:0] out;
 always @ (*) begin
 
     case (sel)
-        `OPCODE_I_TYPE, `OPCODE_JAL: begin
+        `OPCODE_JAL: begin
             out = jump;
         end
-	`OPCODE_I_TYPE, `OPCODE_JALR: begin
+	`OPCODE_JALR: begin
             out = ra;
         end
         default: begin
