@@ -12,7 +12,8 @@ module decode (
     output reg [31:0] imm,
     output reg writeback,
     output reg we,
-    output reg [3:0] alu_op      // alu control signal,
+    output reg [3:0] alu_op,      // alu control signal
+    output reg is_jump               // signal for JAL/JALR instructions
 );
 
     always @ (*) begin
@@ -26,6 +27,7 @@ module decode (
 
         // NOP code
         alu_op = 4'b0000;
+        is_jump = 1'b0; // default not a jump
 
         // R&I-Type Instructions (ALU Opcode selection)
         case (opcode)
@@ -51,15 +53,20 @@ module decode (
             end
             `OPCODE_LUI: begin // cheating for this one
                 alu_op = `ALU_ADDI;
-                opcode = `OPCODE_R_TYPE;
                 rs1 = 5'b00000;
+            end
+            `OPCODE_JAL: begin
+                is_jump = 1'b1;
+                alu_op = 4'b0000; // JAL doesn't use ALU
             end
         endcase
 
         // Immediate-Value (Not utilized by R-Type Instructions)
         case (opcode)
             `OPCODE_JAL: begin
-                imm =       {{11{inst_encoding[31]}}, inst_encoding[31], inst_encoding[19:12], inst_encoding[20], inst_encoding[30:25], inst_encoding[24:21], 1'b0};
+                // JAL immediate: imm[20|10:1|11|19:12] from inst[31:12]
+                // Result: imm[20:0] = {inst[31], inst[19:12], inst[20], inst[30:21], 1'b0}
+                imm =       {{11{inst_encoding[31]}}, inst_encoding[31], inst_encoding[19:12], inst_encoding[20], inst_encoding[30:21], 1'b0};
             end
             `OPCODE_I_TYPE: begin
                 imm =       {{20{inst_encoding[31]}}, inst_encoding[31:20]};
@@ -78,10 +85,9 @@ module decode (
             end
             default: writeback = 1'b0;
         endcase
-
+        // Write Enable
         case (opcode)
-            // Add other opcodes here that need we
-            `OPCODE_I_TYPE, `OPCODE_LUI: begin
+            `OPCODE_R_TYPE, `OPCODE_I_TYPE, `OPCODE_LUI, `OPCODE_JAL: begin
                 we = 1'b1;
             end
             default: we = 1'b0;
