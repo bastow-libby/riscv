@@ -7,3 +7,9 @@ transcript
 *.mpf
 *.wlf
 work/
+
+# Icarus Verilog compiled files
+*_sim
+*.vvp
+*.vcd
+*.lxt

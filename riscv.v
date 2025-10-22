@@ -24,6 +24,9 @@ wire [31:0] alu_out;
 wire [31:0] alu_in;
 wire is_jump;
 wire [31:0] writeback_data;
+wire mem_read;
+wire mem_write;
+wire [31:0] mem_data_out;
 
 // PC logic: calculate PC+4 and PC+imm
 genadder pcadder(.A(curr_pc), .B(32'h4), .S(pc_plus_4), .Cin(1'b0), .Cout());
@@ -34,16 +37,18 @@ assign next_pc = is_jump ? pc_plus_imm : pc_plus_4;
 
 register32 pcmodule(.din(next_pc), .we(1'b1), .dout(curr_pc), .clk(clk), .rst(rst));
 memory2c imem(.data_out(inst_encoding), .data_in(32'h0), .addr(curr_pc), .enable(1'b1), .wr(1'b0), .createdump(1'b0), .clk(clk), .rst(rst));
-decode decoder(.inst_encoding(inst_encoding), .opcode(opcode), .funct3(funct3), .funct7(funct7), .rs1(rs1), .rs2(rs2), .rd(rd), .imm(imm), .writeback(writeback), .we(we), .alu_op(alu_op), .is_jump(is_jump));
+decode decoder(.inst_encoding(inst_encoding), .opcode(opcode), .funct3(funct3), .funct7(funct7), .rs1(rs1), .rs2(rs2), .rd(rd), .imm(imm), .writeback(writeback), .we(we), .alu_op(alu_op), .is_jump(is_jump), .mem_read(mem_read), .mem_write(mem_write));
 
-// Writeback data mux: if JAL, writeback PC+4, else writeback ALU output
-assign writeback_data = is_jump ? pc_plus_4 : alu_out;
+// Writeback data mux: if JAL/JALR, writeback PC+4; if load, writeback mem_data; else writeback ALU output
+assign writeback_data = is_jump ? pc_plus_4 : (mem_read ? mem_data_out : alu_out);
 
 // read registers for R1 and r2
 register registr(.a0(rs1), .a1(rs2), .wr(rd), .we(we), .din(writeback_data), .clk(clk), .rst(rst), .q0(reg_data_1), .q1(reg_data_2));
 alu_mux mux1(.r2(reg_data_2), .imm(imm), .sel(opcode), .out(alu_in));
 alu riscv_alu(.a(reg_data_1), .b(alu_in), .func(alu_op), .out(alu_out));
-  
+
+// Data memory for load/store instructions
+memory2c dmem(.data_out(mem_data_out), .data_in(reg_data_2), .addr(alu_out), .enable(mem_read | mem_write), .wr(mem_write), .createdump(1'b0), .clk(clk), .rst(rst));
 
 
 endmodule
