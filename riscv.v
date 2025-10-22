@@ -33,6 +33,8 @@ genadder pcadder(.A(curr_pc), .B(32'h4), .S(pc_plus_4), .Cin(1'b0), .Cout());
 genadder pc_imm_adder(.A(curr_pc), .B(imm), .S(pc_plus_imm), .Cin(1'b0), .Cout());
 
 // PC mux: if JAL, next PC = PC + imm, else next PC = PC + 4
+//Libby, change to include jalr (ra) also
+//might need to make tripple mux
 assign next_pc = is_jump ? pc_plus_imm : pc_plus_4;
 
 register32 pcmodule(.din(next_pc), .we(1'b1), .dout(curr_pc), .clk(clk), .rst(rst));
@@ -41,6 +43,7 @@ decode decoder(.inst_encoding(inst_encoding), .opcode(opcode), .funct3(funct3), 
 
 // Writeback data mux: if JAL/JALR, writeback PC+4; if load, writeback mem_data; else writeback ALU output
 assign writeback_data = is_jump ? pc_plus_4 : (mem_read ? mem_data_out : alu_out);
+
 
 // read registers for R1 and r2
 register registr(.a0(rs1), .a1(rs2), .wr(rd), .we(we), .din(writeback_data), .clk(clk), .rst(rst), .q0(reg_data_1), .q1(reg_data_2));

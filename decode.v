@@ -1,6 +1,6 @@
 `timescale 1us/100ns
 `include "define.vh"
-
+//how to write to write to rd for jalr... ?
 module decode (
     input  [31:0] inst_encoding,   // instruction bits that are encoded
     output reg [6:0] opcode, // outputs to be sent out to each module
