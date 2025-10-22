@@ -24,6 +24,8 @@ wire [31:0] alu_out;
 wire [31:0] alu_in;
 wire is_jump;
 wire [31:0] writeback_data;
+wire mem_we;
+wire [31:0] mem_out;
 
 // PC logic: calculate PC+4 and PC+imm
 genadder pcadder(.A(curr_pc), .B(32'h4), .S(pc_plus_4), .Cin(1'b0), .Cout());
@@ -47,6 +49,6 @@ register registr(.a0(rs1), .a1(rs2), .wr(rd), .we(we), .din(writeback_data), .cl
 alu_mux mux1(.r2(reg_data_2), .imm(imm), .sel(opcode), .out(alu_in));
 alu riscv_alu(.a(reg_data_1), .b(alu_in), .func(alu_op), .out(alu_out));
   
-
+memory2c dmem(.data_out(mem_out), .data_in(reg_data_2), .addr(alu_out), .enable(1'b1), .wr(mem_we), .createdump(1'b0), .clk(clk), .rst(rst));
 
 endmodule
