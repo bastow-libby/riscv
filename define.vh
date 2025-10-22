@@ -17,8 +17,8 @@
 // ------------------------------------------
 `define OPCODE_R_TYPE   7'b0110011 // Only the first 5 bits are relevant for all of these
 `define OPCODE_I_TYPE   7'b0010011
-`define OPCODE_SW       7'b0100011
-`define OPCODE_LW       7'b0000011
+`define OPCODE_S_TYPE   7'b0100011
+`define OPCODE_L_TYPE   7'b0000011
 `define OPCODE_B_TYPE   7'b1100011
 `define OPCODE_LUI      7'b0110111
 `define OPCODE_AUIPC    7'b0010111
@@ -32,6 +32,8 @@
 `define FUNCT3_OR       3'b110
 `define FUNCT3_XOR      3'b100
 `define FUNCT3_ADDI     3'b000
+`define FUNCT3_SW       3'b010
+`define FUNCT3_LW       3'b010
 
 // ------------------------------------------
 // funct7 field - for R type instructions
