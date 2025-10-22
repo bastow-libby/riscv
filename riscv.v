@@ -32,7 +32,7 @@ genadder pc_imm_adder(.A(curr_pc), .B(imm), .S(pc_plus_imm), .Cin(1'b0), .Cout()
 // PC mux: if JAL, next PC = PC + imm, else next PC = PC + 4
 //Libby, change to include jalr (ra) also
 //might need to make tripple mux
-assign next_pc = is_jump ? pc_plus_imm : pc_plus_4;
+tripple_mux pc_mux(.plus_4(pc_plus_4), .jump(pc_plus_imm), .ra(reg_data_1), .sel(opcode), .out(next_pc));
 
 register32 pcmodule(.din(next_pc), .we(1'b1), .dout(curr_pc), .clk(clk), .rst(rst));
 memory2c imem(.data_out(inst_encoding), .data_in(32'h0), .addr(curr_pc), .enable(1'b1), .wr(1'b0), .createdump(1'b0), .clk(clk), .rst(rst));

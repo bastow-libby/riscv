@@ -12,5 +12,6 @@ _start:
 	addi x2, x0, 0x2
 	addi x2, x0, 0x3
 	addi x2, x0, 0x4
+	jalr x1, x1, 0x0
 	
 	add x10, x7, x9
