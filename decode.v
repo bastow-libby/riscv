@@ -1,6 +1,6 @@
 `timescale 1us/100ns
 `include "define.vh"
-
+//how to write to write to rd for jalr... ?
 module decode (
     input  [31:0] inst_encoding,   // instruction bits that are encoded
     output reg [6:0] opcode, // outputs to be sent out to each module
@@ -59,6 +59,11 @@ module decode (
                 is_jump = 1'b1;
                 alu_op = 4'b0000; // JAL doesn't use ALU
             end
+	    `OPCODE_JALR: begin
+		is_jump = 1'b1;
+		alu_op = 4'b0000;
+	    end
+
         endcase
 
         // Immediate-Value (Not utilized by R-Type Instructions)
@@ -74,20 +79,23 @@ module decode (
             `OPCODE_LUI: begin // Cheating a bit for this instruction
                 imm =       {{inst_encoding[31:12]}, 12'b0};
             end
+	    `OPCODE_JALR: begin
+		imm =       {{20{inst_encoding[31]}}, inst_encoding[31:20]};
+	     end
             default: imm =  {{20{inst_encoding[31]}}, inst_encoding[31:20]};
         endcase
 
         // Register Writeback
         case (opcode)
             // Add other opcodes here that need writeback
-            `OPCODE_LUI, `OPCODE_JAL: begin
+            `OPCODE_LUI, `OPCODE_JAL, `OPCODE_JALR: begin
                 writeback = 1'b1;
             end
             default: writeback = 1'b0;
         endcase
         // Write Enable
         case (opcode)
-            `OPCODE_R_TYPE, `OPCODE_I_TYPE, `OPCODE_LUI, `OPCODE_JAL: begin
+            `OPCODE_R_TYPE, `OPCODE_I_TYPE, `OPCODE_LUI, `OPCODE_JAL, `OPCODE_JALR: begin
                 we = 1'b1;
             end
             default: we = 1'b0;

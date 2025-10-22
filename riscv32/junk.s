@@ -1,5 +1,6 @@
 _start:
-	addi x1, x0, 0xff
+	jal x1, 0x20
+	addi x2, x0, 0xff
 	addi x2, x1, 1
 	addi x3, x1, -1
 	sub x4, x3, x2
@@ -9,4 +10,5 @@ _start:
 	addi x7, x7, 0x0000
 	addi x8, x7, 0xf # should equal 0x10000f
 	lui x9, 0x00001
+	jalr x1, x1, 0
 	add x10, x7, x9
