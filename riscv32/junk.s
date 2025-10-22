@@ -15,3 +15,5 @@ _start:
 	jalr x1, x1, 0x0
 	
 	add x10, x7, x9
+	lw
+	sw
