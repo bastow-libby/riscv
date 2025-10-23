@@ -11,13 +11,12 @@ always @ (*) begin
         `OPCODE_JAL: begin
             out = jump;
         end
-	`OPCODE_S_TYPE: begin
+        `OPCODE_S_TYPE: begin
             out = dmem_out;
         end
-	`OPCODE_L_TYPE: begin
-	    out = dmem_out;
-	end
-	
+        `OPCODE_L_TYPE: begin
+            out = dmem_out;
+        end
         default: begin
             out = alu_out;
         end

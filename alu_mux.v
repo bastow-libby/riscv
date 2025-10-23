@@ -8,7 +8,7 @@ output reg [31:0] out;
 always @ (*) begin
 
     case (sel)
-        `OPCODE_I_TYPE, `OPCODE_LUI: begin
+        `OPCODE_I_TYPE, `OPCODE_LUI, `OPCODE_S_TYPE, `OPCODE_L_TYPE: begin
             out = imm;
         end
         default: begin
@@ -19,4 +19,3 @@ always @ (*) begin
 end
 
 endmodule
-

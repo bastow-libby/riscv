@@ -11,7 +11,7 @@ always @ (*) begin
         `OPCODE_JAL: begin
             out = jump;
         end
-	`OPCODE_JALR: begin
+        `OPCODE_JALR: begin
             out = ra;
         end
         default: begin

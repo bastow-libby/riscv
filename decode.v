@@ -1,6 +1,6 @@
 `timescale 1us/100ns
 `include "define.vh"
-//how to write to write to rd for jalr... ?
+
 module decode (
     input  [31:0] inst_encoding,   // instruction bits that are encoded
     output reg [6:0] opcode, // outputs to be sent out to each module
@@ -12,6 +12,7 @@ module decode (
     output reg [31:0] imm,
     output reg writeback,
     output reg we,
+    output reg mem_we,
     output reg [3:0] alu_op,      // alu control signal
     output reg is_jump               // signal for JAL/JALR instructions
 );
@@ -97,22 +98,33 @@ module decode (
             `OPCODE_S_TYPE: begin
                 imm =       {{20{inst_encoding[31]}}, inst_encoding[31:25], inst_encoding[11:7]};
             end
+            `OPCODE_L_TYPE: begin
+                imm =       {{20{inst_encoding[31]}}, inst_encoding[31:20]};
+            end
         endcase
 
         // Register Writeback
         case (opcode)
             // Add other opcodes here that need writeback
-            `OPCODE_LUI, `OPCODE_JAL, `OPCODE_JALR: begin
+            `OPCODE_LUI, `OPCODE_JAL, `OPCODE_JALR, `OPCODE_L_TYPE: begin
                 writeback = 1'b1;
             end
             default: writeback = 1'b0;
         endcase
         // Write Enable
         case (opcode)
-            `OPCODE_R_TYPE, `OPCODE_I_TYPE, `OPCODE_LUI, `OPCODE_JAL, `OPCODE_JALR: begin
+            `OPCODE_R_TYPE, `OPCODE_I_TYPE, `OPCODE_LUI, `OPCODE_JAL, `OPCODE_JALR, `OPCODE_L_TYPE: begin
                 we = 1'b1;
             end
             default: we = 1'b0;
+        endcase
+
+        // Memory Write Enable
+        case (opcode)
+            `OPCODE_S_TYPE: begin
+                mem_we = 1'b1;
+            end
+            default mem_we = 1'b0;
         endcase
 
     end
