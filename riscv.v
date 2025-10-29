@@ -8,6 +8,11 @@ wire [31:0] next_pc;
 wire [31:0] pc_plus_4;
 wire [31:0] pc_plus_imm;
 wire [31:0] inst_encoding;
+// - IF_ID REG -
+wire [31:0] o_inst_encoding;
+wire [31:0] o_pc;
+wire stall_cs;
+//
 wire [6:0] opcode;
 wire [2:0] funct3;
 wire [6:0] funct7;
@@ -27,6 +32,8 @@ wire [31:0] writeback_data;
 wire mem_we;
 wire [31:0] mem_out;
 
+// --- FETCH STAGE ---
+
 // PC logic: calculate PC+4 and PC+imm
 genadder pcadder(.A(curr_pc), .B(32'h4), .S(pc_plus_4), .Cin(1'b0), .Cout());
 genadder pc_imm_adder(.A(curr_pc), .B(imm), .S(pc_plus_imm), .Cin(1'b0), .Cout());
@@ -38,7 +45,14 @@ tripple_mux pc_mux(.plus_4(pc_plus_4), .jump(pc_plus_imm), .ra(reg_data_1), .sel
 
 register32 pcmodule(.din(next_pc), .we(1'b1), .dout(curr_pc), .clk(clk), .rst(rst));
 memory2c imem(.data_out(inst_encoding), .data_in(32'h0), .addr(curr_pc), .enable(1'b1), .wr(1'b0), .createdump(1'b0), .clk(clk), .rst(rst));
-decode decoder(.inst_encoding(inst_encoding), .opcode(opcode), .funct3(funct3), .funct7(funct7), .rs1(rs1), .rs2(rs2), .rd(rd), .imm(imm), .writeback(writeback), .we(we), .mem_we(mem_we), .alu_op(alu_op), .is_jump(is_jump));
+
+// - IF_ID REG -
+
+if_id_reg if_id_register(.inst_encoding(inst_encoding), .pc(curr_pc), .o_inst_encoding(o_inst_encoding), .o_pc(o_pc), .stall_cs(stall_cs));
+
+// --- INSTRUCTION DECODE STAGE ---
+
+decode decoder(.inst_encoding(o_inst_encoding), .opcode(opcode), .funct3(funct3), .funct7(funct7), .rs1(rs1), .rs2(rs2), .rd(rd), .imm(imm), .writeback(writeback), .we(we), .mem_we(mem_we), .alu_op(alu_op), .is_jump(is_jump));
 
 // Writeback data mux: if JAL, writeback PC+4, else writeback ALU output
 

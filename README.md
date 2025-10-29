@@ -5,4 +5,8 @@
 3. Add existing files -> all .v and .vh files
 4. boom
 
-TODO: make todo :)
+dans awesome
+TODO: refactor stuff
+TODO: add some more fun opcodes
+TODO: add branch
+TODO: start pipelining
