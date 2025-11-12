@@ -2,35 +2,32 @@
 `include "define.vh"
 
 module decode (
-    input  [31:0] inst_encoding,   // instruction bits that are encoded
-    output reg [6:0] opcode, // outputs to be sent out to each module
-    output reg [2:0] funct3,
-    output reg [6:0] funct7,
-    output reg [4:0] rs1,
-    output reg [4:0] rs2,
-    output reg [4:0] rd,
-    output reg [31:0] imm,
-    output reg writeback,
-    output reg we,
-    output reg mem_we,
-    output reg [3:0] alu_op,      // alu control signal
-    output reg is_jump               // signal for JAL/JALR instructions
+    input [31:0]        instruction_encoding,
+    output reg [6:0]    opcode,
+    output reg [2:0]    funct3,
+    output reg [6:0]    funct7,
+    output reg [4:0]    rs1,
+    output reg [4:0]    rs2,
+    output reg [4:0]    rd,
+    output reg [31:0]   imm,
+    output reg [3:0]    alu_op,
+    output reg [7:0]    control_unit_signal,
+    output reg flush_cs
 );
 
-    always @ (*) begin
-        opcode = inst_encoding[6:0];
-        rd     = inst_encoding[11:7];
-        funct3 = inst_encoding[14:12];
-        rs1    = inst_encoding[19:15];
-        rs2    = inst_encoding[24:20];
-        funct7 = inst_encoding[31:25];
-        imm    = 32'b0; // default 
+always @ (*) begin
+        opcode = instruction_encoding[6:0];
+        rd     = instruction_encoding[11:7];
+        funct3 = instruction_encoding[14:12];
+        rs1    = instruction_encoding[19:15];
+        rs2    = instruction_encoding[24:20];
+        funct7 = instruction_encoding[31:25];
+        imm    = 32'b0;
 
         // NOP code
         alu_op = 4'b0000;
-        is_jump = 1'b0; // default not a jump
 
-        // R&I-Type Instructions (ALU Opcode selection)
+        // R&I-Type Instructions
         case (opcode)
             `OPCODE_R_TYPE: begin
                 case (funct3)
@@ -49,21 +46,19 @@ module decode (
             `OPCODE_I_TYPE: begin
                 case (funct3)
                     `FUNCT3_ADDI:	alu_op = `ALU_ADDI;
+                    `FUNCT3_SLLI:   alu_op = `ALU_SLLI;
+                    `FUNCT3_SRLI: begin
+                        if (funct7 == `FUNCT7_SRLI)
+                            alu_op = `ALU_SRLI;
+                        else
+                            alu_op = `ALU_SRAI;
+                    end
                     default:		alu_op = 4'bxxxx;
                 endcase
             end
-            `OPCODE_LUI: begin // cheating for this one
+            `OPCODE_LUI: begin
                 alu_op = `ALU_ADDI;
                 rs1 = 5'b00000;
-            end
-            // J-Type
-            `OPCODE_JAL: begin
-                is_jump = 1'b1;
-                alu_op = 4'b0000; // JAL doesn't use ALU
-            end
-            `OPCODE_JALR: begin
-                is_jump = 1'b1;
-                alu_op = 4'b0000;
             end
             // S-Type
             `OPCODE_S_TYPE: begin
@@ -82,50 +77,75 @@ module decode (
         // Immediate-Value (Not utilized by R-Type Instructions)
         case (opcode)
             `OPCODE_JAL: begin
-                // JAL immediate: imm[20|10:1|11|19:12] from inst[31:12]
-                // Result: imm[20:0] = {inst[31], inst[19:12], inst[20], inst[30:21], 1'b0}
-                imm =       {{11{inst_encoding[31]}}, inst_encoding[31], inst_encoding[19:12], inst_encoding[20], inst_encoding[30:21], 1'b0};
+                imm =       {{11{instruction_encoding[31]}}, instruction_encoding[31], instruction_encoding[19:12], instruction_encoding[20], instruction_encoding[30:21], 1'b0};
             end
-            `OPCODE_I_TYPE, `OPCODE_L_TYPE: begin
-                imm =       {{20{inst_encoding[31]}}, inst_encoding[31:20]};
-            end
-            `OPCODE_LUI: begin // Cheating a bit for this instruction
-                imm =       {{inst_encoding[31:12]}, 12'b0};
-            end
-            `OPCODE_JALR: begin
-                imm =       {{20{inst_encoding[31]}}, inst_encoding[31:20]};
-            end
-            `OPCODE_S_TYPE: begin
-                imm =       {{20{inst_encoding[31]}}, inst_encoding[31:25], inst_encoding[11:7]};
+            `OPCODE_I_TYPE: begin
+                case (funct3)
+                    `FUNCT3_SLLI, `FUNCT3_SRLI: begin
+                    imm =   {{27{instruction_encoding[27]}}, instruction_encoding[24:20]};
+                    end
+                default: begin
+                    imm =   {{20{instruction_encoding[31]}}, instruction_encoding[31:20]};
+                end
+                endcase
             end
             `OPCODE_L_TYPE: begin
-                imm =       {{20{inst_encoding[31]}}, inst_encoding[31:20]};
+                imm =       {{20{instruction_encoding[31]}}, instruction_encoding[31:20]};
             end
-        endcase
-
-        // Register Writeback
-        case (opcode)
-            // Add other opcodes here that need writeback
-            `OPCODE_LUI, `OPCODE_JAL, `OPCODE_JALR, `OPCODE_L_TYPE: begin
-                writeback = 1'b1;
+            `OPCODE_LUI: begin // Cheating a bit for this instruction
+                imm =       {{instruction_encoding[31:12]}, 12'b0};
             end
-            default: writeback = 1'b0;
-        endcase
-        // Write Enable
-        case (opcode)
-            `OPCODE_R_TYPE, `OPCODE_I_TYPE, `OPCODE_LUI, `OPCODE_JAL, `OPCODE_JALR, `OPCODE_L_TYPE: begin
-                we = 1'b1;
+            `OPCODE_JALR: begin
+                imm =       {{20{instruction_encoding[31]}}, instruction_encoding[31:20]};
             end
-            default: we = 1'b0;
-        endcase
-
-        // Memory Write Enable
-        case (opcode)
             `OPCODE_S_TYPE: begin
-                mem_we = 1'b1;
+                imm =       {{20{instruction_encoding[31]}}, instruction_encoding[31:25], instruction_encoding[11:7]};
             end
-            default mem_we = 1'b0;
+            `OPCODE_L_TYPE: begin
+                imm =       {{20{instruction_encoding[31]}}, instruction_encoding[31:20]};
+            end
+            `OPCODE_B_TYPE: begin
+                imm =       {{20{instruction_encoding[31]}}, instruction_encoding[12], instruction_encoding[10:5], instruction_encoding[4:1], instruction_encoding[11]};
+            end
         endcase
+
+        // ---
+        // Control Unit Logic
+        // ---
+
+        // This outputs a 8-bit control signal in the format of
+        // register_write_enable, alu_src, writeback, mem_read, mem_write_enable, branch, jump, jalr
+        // Bit[0] is the MOST significant bit, weird.
+
+        control_unit_signal = 8'b00000000;
+
+        case (opcode)
+            `OPCODE_R_TYPE: begin
+                control_unit_signal =   8'b00000001;
+            end
+            `OPCODE_I_TYPE, `OPCODE_LUI, `OPCODE_AUIPC: begin
+                control_unit_signal =   8'b00000011;
+            end
+            `OPCODE_L_TYPE: begin
+                control_unit_signal =   8'b00001111;
+            end
+            `OPCODE_S_TYPE: begin
+                control_unit_signal =   8'b00010010;
+            end
+            `OPCODE_B_TYPE: begin
+                control_unit_signal =   8'b00100000;
+            end
+            `OPCODE_JAL: begin
+                control_unit_signal =   8'b01000001;
+            end
+            `OPCODE_JALR: begin
+                control_unit_signal =   8'b11000011;
+            end
+        endcase
+
+        // Jump flush control signal
+
+        flush_cs = ((opcode == `OPCODE_JAL) | (opcode == `OPCODE_JALR));
 
     end
 

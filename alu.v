@@ -1,53 +1,50 @@
 `timescale 1us/100ns
 `include "define.vh"
 
-//Attempt at ALU using case statements
 module alu(
-input [31:0] a,b,   // change to rs1 rs2?                 
-input [3:0] func,// ALU Selection
-output [31:0] out
+    input [31:0] rs1, rs2,  
+    input [3:0] alu_op,
+    output reg [31:0] result
 );
 
-
-reg [31:0] result;
-assign out = result;
-
-//I'm sort of worried abt the cases not being complete...
-//adder 
-wire [31:0] add_result;
-wire [31:0] cout;
-adder32 alu_adder(.A(a), .B(b), .Cin(1'b0), .S(add_result), .Cout(cout));
-
-// TODO: Need to grab correct input for rs1, rs2, rd, etc + Output to correct locations.
-// pls test bench this libby - dan
 always @(*) begin
-    case(func)
+    case(alu_op)
         // R-Type Instructions
-        `ALU_ADD: begin // ADD
-            result = add_result;
+        `ALU_ADD: begin
+            result = rs1 + rs2;
             end
         
-        `ALU_SUB: begin // SUB
-            result = a - b;
+        `ALU_SUB: begin
+            result = rs1 - rs2;
             end
 
-        `ALU_AND: begin // AND
-            result = a & b;
+        `ALU_AND: begin
+            result = rs1 & rs2;
             end
 
-        `ALU_OR: begin // OR
-            result = a | b;
+        `ALU_OR: begin
+            result = rs1 | rs2;
             end
 
-        `ALU_XOR: begin // XOR
-            result = a ^ b;
+        `ALU_XOR: begin
+            result = rs1 ^ rs2;
             end
 
         // I-Type Instructions
-        // ToDo: Actually grab the immediate correctly
-        `ALU_ADDI: begin // ADDI
-            result = a + b;
+        `ALU_ADDI: begin
+            result = rs1 + rs2;
             end
+        `ALU_SLLI: begin
+            result = rs1 << rs2;
+            end
+        `ALU_SRLI: begin
+            result = rs1 >> rs2;
+            end
+        `ALU_SRAI: begin
+            result = rs1 >>> rs2;
+            end
+
+        // Default Case
         default: begin
             result = 32'h00000000;
         end
