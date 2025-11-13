@@ -3,7 +3,7 @@
 `include "define.vh"
 
 module branch_comp_unit(
-    input is_branch,
+    input [7:0] is_branch,
     input [1:0] fub_cs_1,
     input [1:0] fub_cs_2,
     input [2:0] funct3,
@@ -19,7 +19,7 @@ module branch_comp_unit(
     reg signed [31:0] rs2_val;
 
 always @(*) begin
-    if (is_branch) begin
+    if (is_branch[5] == 1'b1) begin
 
         rs1_val = rs1;
         rs2_val = rs2;

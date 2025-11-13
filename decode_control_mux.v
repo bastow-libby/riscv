@@ -1,3 +1,4 @@
+//Dan is pretty sure this mux flushes everything
 module decode_control_mux(
     input stall,
     input flush,

@@ -1,8 +1,8 @@
-module fetch_decode_reg(inst_encoding, pc, o_inst_encoding, o_pc, stall, flush, clk);
+module fetch_decode_reg(inst_encoding, pc, o_inst_encoding, o_pc, stall, flush, clk, rst);
 
     input [31:0] inst_encoding;
     input [31:0] pc;
-    input stall, flush, clk;
+    input stall, flush, clk, rst;
 
     output reg [31:0] o_inst_encoding;
     output reg [31:0] o_pc;
