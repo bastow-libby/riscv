@@ -5,7 +5,7 @@
 
 module tb_common #(parameter CLK_PERIOD = 2) (
     output reg clk,
-    output integer error
+    output reg [31:0] error
 );
 
     initial clk = 0;
@@ -16,7 +16,7 @@ module tb_common #(parameter CLK_PERIOD = 2) (
         if (error !== 0) begin
             $display("Test Failed. Error at %0d.", error);
             # (CLK_PERIOD * 2);
-            $finish_and_return(1);
+            $finish;
         end
     end
 
