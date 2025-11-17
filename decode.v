@@ -39,6 +39,7 @@ always @ (*) begin
                 end
                 `FUNCT3_AND:	alu_op = `ALU_AND;
                 `FUNCT3_OR:		alu_op = `ALU_OR;
+                `FUNCT3_XOR:    alu_op = `ALU_XOR;
                 default:		alu_op = 4'bxxxx;
             endcase
         end
@@ -115,7 +116,7 @@ always @ (*) begin
 
     // This outputs a 8-bit control signal in the format of
     // register_write_enable, alu_src, writeback, mem_read, mem_write_enable, branch, jump, jalr
-    // Bit[0] is the MOST significant bit, weird.
+    // Bit[0] is the least significant bit, weird.
 
     control_unit_signal = 8'b00000000;
 

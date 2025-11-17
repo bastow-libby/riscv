@@ -15,8 +15,8 @@ module tb_common #(parameter CLK_PERIOD = 2) (
     always @(error) begin
         if (error !== 0) begin
             $display("Test Failed. Error at %0d.", error);
-            # (CLK_PERIOD * 2);
-            $finish;
+            // # (CLK_PERIOD * 2);
+            // $finish;
         end
     end
 
