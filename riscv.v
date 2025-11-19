@@ -11,7 +11,6 @@ wire [31:0] next_pc;
 wire [31:0] curr_pc;
 wire [31:0] target_address;
 wire [31:0] o_pc;
-wire [31:0] rs1_data;
 wire [31:0] imm;
 wire [7:0] control_unit_signal;
 wire branch_comp;
@@ -22,23 +21,19 @@ wire stall;
 wire flush;
 wire [31:0] o_inst_encoding;
 //DECODE SIGNALS
-wire [7:0] opcode;
+wire [6:0] opcode;
 wire [2:0] funct3;
 wire [6:0] funct7;
 wire [4:0] rs1;
 wire [4:0] rs2;
 wire [4:0] rd;
-wire [31:0] imm;
 wire [3:0] alu_op;
-wire [7:0] control_unit_signal;
 wire [31:0] writeback_data;
 wire mem_wb_reg_we;
 wire [31:0] rs1_data;
 wire [31:0] rs2_data;
 wire [3:0] id_mux_alu_op;
 wire [7:0] id_mux_control_unit_signal;
-wire mem_stage_register_write_enable;
-wire mem_stage_writeback;
 wire [1:0] fub_cs_1;
 wire [1:0] fub_cs_2;
 wire [31:0] o_alu_output;
@@ -50,12 +45,11 @@ wire [7:0] ex_mem_control_unit_signal;
 wire [7:0] ex_o_control_unit_signal;
 // ID/EX Register
 wire [31:0] id_ex_o_pc;
-wire [31:0] id_ex_o_rs1;
-wire [31:0] id_ex_o_rs2;
+wire [4:0] id_ex_o_rs1;
+wire [4:0] id_ex_o_rs2;
 wire [31:0] id_ex_o_rs1_data;
 wire [31:0] id_ex_o_rs2_data;
 wire [31:0] id_ex_o_imm;
-wire [3:0] id_ex_o_alu_op;
 // EXECUTE SIGNALS
 wire [1:0] fua_cs_1;
 wire [1:0] fua_cs_2;
@@ -65,14 +59,14 @@ wire [31:0] alu_rs2_data;
 wire [3:0] id_ex_alu_op;
 wire [31:0] alu_output;
 wire [4:0] mem_wb_rd;
-wire mem_wb_writeback
+wire mem_wb_writeback;
 // EX/MEM Register
 wire [31:0] ex_mem_mem_write_data;
 wire ex_mem_mem_write;
 // MEMORY SIGNALS
 wire [31:0] dmem_out;
 // MEM/WB Register
-wire [31:0] mem_wb_alu_output
+wire [31:0] mem_wb_alu_output;
 
 // Program counter
 register32 pc(
@@ -144,11 +138,10 @@ register register_file(
     .din(writeback_data), // Input - from writeback_mux
     .a0(rs1), // Input - from decode
     .a1(rs2), // Input - from decode
-    .wr(1'b1),
+    .wr(mem_wb_rd), // Input - from mem/wb reg
     .write_enable(mem_wb_reg_we), // Input - from mem/wb reg
     .q0(rs1_data), // Outputs
-    .q1(rs2_data),
-
+    .q1(rs2_data)
 );
 
 decode_control_mux decode_control_muxxer(
@@ -212,7 +205,7 @@ decode_execute_reg id_ex_reg(
     .o_rs2_data(id_ex_o_rs2_data),   
     .o_imm(id_ex_o_imm), 
     .o_rd(id_ex_o_rd), 
-    .o_alu_op(id_ex_o_alu_op), 
+    .o_alu_op(id_ex_alu_op), 
     .o_control_unit_signal(id_ex_o_control_unit_signal) 
 );
 
@@ -274,7 +267,7 @@ execute_memory_reg ex_mem_reg(
 memory2c dmem(
     .data_out(dmem_out), // Output
     .data_in(ex_mem_mem_write_data), // Input - from ex/mem reg
-    .addr(ex_mem_rd), // Input - from ex/mem reg
+    .addr(o_alu_output), // Input - from ex/mem reg
     .enable(1'b1),
     .wr(ex_mem_mem_write), // Input - from ex/mem reg
     .createdump(1'b0),
