@@ -1,8 +1,8 @@
 module forwarding_unit_alu(
     input [4:0] mem_rd,
-    input mem_register_write_enable,
+    input [7:0] mem_we,
     input [4:0] writeback_rd,
-    input writeback_register_write_enable,
+    input writeback,
     input [4:0] rs1,
     input [4:0] rs2,
     output reg [1:0] fua_cs_1,
@@ -14,7 +14,7 @@ always @(*) begin
     fua_cs_1 = 2'b0;
     fua_cs_2 = 2'b0;
 
-    if (mem_register_write_enable == 1'b1) begin
+    if (mem_register_write_enable[0] == 1'b1) begin
 
         if (mem_rd == rs1)
             fua_cs_1 = 2'b01;
@@ -23,7 +23,7 @@ always @(*) begin
 
     end
 
-    if (writeback_register_write_enable == 1'b1) begin
+    if (writeback == 1'b1) begin
 
         if (writeback_rd == rs1)
             fua_cs_1 = 2'b10;
