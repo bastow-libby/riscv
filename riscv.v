@@ -10,13 +10,17 @@ module riscv(
 wire [31:0] next_pc;
 wire [31:0] curr_pc;
 wire [31:0] target_address;
-
+wire [31:0] o_pc;
+wire [31:0] rs1_data;
+wire [31:0] imm;
+wire [7:0] control_unit_signal;
+wire branch_comp;
 //FETCH SIGNALS
 wire [31:0] instruction_encoding;
-
+// IF/ID Register
 wire stall;
 wire flush;
-
+wire [31:0] o_inst_encoding;
 //DECODE SIGNALS
 wire [7:0] opcode;
 wire [2:0] funct3;
@@ -27,36 +31,48 @@ wire [4:0] rd;
 wire [31:0] imm;
 wire [3:0] alu_op;
 wire [7:0] control_unit_signal;
-wire flush_cs;
+wire [31:0] writeback_data;
+wire mem_wb_reg_we;
+wire [31:0] rs1_data;
+wire [31:0] rs2_data;
+wire [3:0] id_mux_alu_op;
+wire [7:0] id_mux_control_unit_signal;
 wire mem_stage_register_write_enable;
 wire mem_stage_writeback;
-wire [31:0] din;
-wire [31:0] q0;
-wire [31:0] q1;
-
-wire [3:0] o_alu_op;
-wire [7:0] o_control_unit_signal;
-
 wire [1:0] fub_cs_1;
 wire [1:0] fub_cs_2;
-
-wire branch_comp;
-
-//EXECUTE SIGNALS
-wire [31:0] o_pc;
-wire [4:0] o_rs1;
-wire [4:0] o_rs2;
-wire [31:0] o_rs1_data;
-wire [31:0] o_rs2_data;
-wire [31:0] o_imm;
-wire [4:0] o_rd;
-// ALU Mux
-wire [31:0] mem_data;
-wire [31:0] writeback_data;
+wire [31:0] o_alu_output;
+wire [31:0] o_mem_read_data;
+wire [4:0] id_ex_o_rd;
+wire [4:0] ex_mem_rd;
+wire [7:0] id_ex_o_control_unit_signal;
+wire [7:0] ex_mem_control_unit_signal;
+wire [7:0] ex_o_control_unit_signal;
+// ID/EX Register
+wire [31:0] id_ex_o_pc;
+wire [31:0] id_ex_o_rs1;
+wire [31:0] id_ex_o_rs2;
+wire [31:0] id_ex_o_rs1_data;
+wire [31:0] id_ex_o_rs2_data;
+wire [31:0] id_ex_o_imm;
+wire [3:0] id_ex_o_alu_op;
+// EXECUTE SIGNALS
 wire [1:0] fua_cs_1;
 wire [1:0] fua_cs_2;
-
+wire [31:0] mem_write_data;
+wire [31:0] alu_rs1_data;
+wire [31:0] alu_rs2_data;
+wire [3:0] id_ex_alu_op;
 wire [31:0] alu_output;
+wire [4:0] mem_wb_rd;
+wire mem_wb_writeback
+// EX/MEM Register
+wire [31:0] ex_mem_mem_write_data;
+wire ex_mem_mem_write;
+// MEMORY SIGNALS
+wire [31:0] dmem_out;
+// MEM/WB Register
+wire [31:0] mem_wb_alu_output
 
 // Program counter
 register32 pc(
@@ -133,9 +149,9 @@ register register_file(
     .q0(rs1_data), // Outputs
     .q1(rs2_data),
 
-)
+);
 
-decode_control_mux(
+decode_control_mux decode_control_muxxer(
     .stall(stall), // Inputs - from hazard unit
     .flush(flush), // Inputs - from decode
     .alu_op(alu_op), // Inputs - from decode
@@ -243,7 +259,7 @@ forwarding_unit_alu fua(
 execute_memory_reg ex_mem_reg(
     .clk(clk), // Input
     .rst(rst), // Input
-    .rd(o_rd), // Input - From ID/EX Register
+    .rd(id_ex_o_rd), // Input - From ID/EX Register
     .mem_write_data(mem_write_data), // Input - From alu_super_mux
     .control_unit_signal(ex_o_control_unit_signal), // Input - From execute_control_mux
     .alu_out(alu_output), // Input - From alu
@@ -257,7 +273,7 @@ execute_memory_reg ex_mem_reg(
 // Memory stage modules
 memory2c dmem(
     .data_out(dmem_out), // Output
-    .data_in(ex_mem_rd), // Input - from ex/mem reg
+    .data_in(ex_mem_mem_write_data), // Input - from ex/mem reg
     .addr(ex_mem_rd), // Input - from ex/mem reg
     .enable(1'b1),
     .wr(ex_mem_mem_write), // Input - from ex/mem reg
