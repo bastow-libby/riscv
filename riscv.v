@@ -213,7 +213,7 @@ decode_execute_reg id_ex_reg(
 alu_super_mux alu_mux(
     .rs1_data(id_ex_o_rs1_data), // Input - from id/ex register
     .rs2_data(id_ex_o_rs2_data), // Input - from id/ex register
-    .mem_data(o_mem_read_data), // Input - from mem/wb register
+    .mem_data(o_alu_output), // Input - from ex/mem register
     .writeback_data(writeback_data), // Input - from writeback_mux
     .fua_cs_1(fua_cs_1), // Input - from fua
     .fua_cs_2(fua_cs_2), // Input - from fua
@@ -239,9 +239,9 @@ execute_control_mux ex_control_mux(
 
 forwarding_unit_alu fua(
     .mem_rd(ex_mem_rd), // Input - from ex/mem register
-    .mem_we(ex_mem_control_unit_signal), // Input - from ex/mem register
+    .mem_we(ex_mem_control_unit_signal[0]), // Input - from ex/mem register
     .writeback_rd(mem_wb_rd), // Input - from mem/wb register
-    .writeback(mem_wb_writeback), // Input - from mem/wb register
+    .writeback_we(mem_wb_reg_we), // Input - from mem/wb register
     .rs1(id_ex_o_rs1), // Input - from id/ex register
     .rs2(id_ex_o_rs2), // Input - from id/ex register
     .fua_cs_1(fua_cs_1), // Outputs cs
