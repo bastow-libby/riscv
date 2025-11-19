@@ -28,6 +28,11 @@ module fetch_decode_reg(inst_encoding, pc, o_inst_encoding, o_pc, stall, flush, 
 
         endcase
 
+        if (rst == 1'b1) begin
+            o_inst_encoding = 0;
+            o_pc = 0;
+        end
+
     end
 
 endmodule

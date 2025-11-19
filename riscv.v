@@ -58,53 +58,159 @@ wire [1:0] fua_cs_2;
 
 wire [31:0] alu_output;
 
-//PC CONTROL 
-register32 pc(.din(next_pc), .write_enable(1b'1), .dout(curr_pc), .clk(clk), .rst(rst));
-pc_unit pc_comp(.pc(curr_pc), .rs1(rs1), .imm(imm), .is_jalr(control_unit_signal[7]), .target_address(target_address));
-pc_mux pc_muxx(.pc(curr_pc), .target_address(target_address), .branch_comp(branch_comp), .jump(control_unit_signal[6]), .next_pc(next_pc));
+// Program counter
+register32 pc(
+    .din(next_pc),
+    .write_enable(1'b1),
+    .dout(curr_pc),
+    .clk(clk),
+    .rst(rst)
+);
 
-//FETCH
-memory2c imem(.data_out(instruction_encoding), .data_in(32b'0), .addr(curr_pc), .enable(1b'1), .wr(1b'0), .createdump(1b'0), .clk(clk), .rst(rst));
+// Program counter control
+pc_unit pc_comp(
+    .pc(o_pc), // Input - from if/id register
+    .rs1(rs1_data), // Input - from register file
+    .imm(imm), // Input - from decode
+    .is_jalr(control_unit_signal[7]), // Input - from decode
+    .target_address(target_address) // Output 
+);
+pc_mux pc_muxx(
+    .pc(curr_pc), // Input - from pc module
+    .target_address(target_address), // Input - from pc_unit
+    .branch_comp(branch_comp), // Input - from branch comp
+    .jump(control_unit_signal[6]), // Input - from decode
+    .next_pc(next_pc) // Output
+);
 
-//FETCH-DECODE REGISTER
-fetch_decode_reg fd_reg(.inst_encoding(instruction_encoding), .pc(curr_pc), .o_inst_encoding(instruction_encoding), .o_pc(curr_pc), .stall(stall), .flush(flush), .clk(clk), .rst(rst));
+// Fetch stage modules
+memory2c imem(
+    .clk(clk), // Input
+    .rst(rst), // Input
+    .data_out(instruction_encoding), // Output
+    .data_in(32'b0),
+    .addr(curr_pc), // Input - from pc module
+    .enable(1'b1), 
+    .wr(1'b0), 
+    .createdump(1'b0)
+);
+
+// IF/ID REGISTER
+fetch_decode_reg if_id_reg(
+    .clk(clk),
+    .rst(rst),
+    .inst_encoding(instruction_encoding), // Input - from instruction memory
+    .pc(curr_pc), // Input - from pc module
+    .stall(stall), // Input - from hazard detection unit
+    .flush(flush), // Input - from decode
+    .o_inst_encoding(o_inst_encoding), // Outputs
+    .o_pc(o_pc)
+);
 
 // Decode stage modules
-decode decoder(.instruction_encoding(instruction_encoding), .opcode(opcode), .funct3(funct3), .funct7(funct7), .rs1(rs1), .rs2(rs2), .rd(rd), .imm(imm), .alu_op(alu_op), .control_unit_signal(control_unit_signal), .flush_cs(flush_cs));
-register register_file(.a0(rs1), .a1(rs2), .wr(1b'1), .write_enable(control_unit_signal[0]), .din(din), .clk(clk), .rst(rst), .q0(q0), .q1(q1));
-decode_control_mux decode_mux(.stall(stall), .flush(flush_cs), .alu_op(alu_op), .control_unit_signal(control_unit_signal), .o_alu_op(o_alu_op), .o_control_unit_signal(o_control_unit_signal));
-forwarding_unit_branch fub(.rs1(rs1), .rs2(rs2), .mem_rd(rd), .mem_stage_register_write_enable(mem_stage_register_write_enable), .mem_stage_writeback(mem_stage_writeback), .fub_cs_1(fub_cs_1), .fub_cs_2(fub_cs_2));
-branch_comp_unit bcu(is_branch(control_unit_signal), .fub_cs_1(fub_cs_1), .fub_cs_2(fub_cs_2), .funct3(funct3), .rs1(rs1), .rs2(rs2), .alu_out(alu_output), .mem_out(?), .branch_comp(branch_comp));
+decode decoder(
+    .instruction_encoding(o_inst_encoding), // Input - from if/id reg
+    .opcode(opcode), // Outputs
+    .funct3(funct3),
+    .funct7(funct7),
+    .rs1(rs1),
+    .rs2(rs2),
+    .rd(rd),
+    .imm(imm),
+    .alu_op(alu_op),
+    .control_unit_signal(control_unit_signal),
+    .flush_cs(flush)
+);
+
+register register_file(
+    .clk(clk),
+    .rst(rst),
+    .din(writeback_data), // Input - from writeback_mux
+    .a0(rs1), // Input - from decode
+    .a1(rs2), // Input - from decode
+    .wr(1'b1),
+    .write_enable(mem_wb_reg_we), // Input - from mem/wb reg
+    .q0(rs1_data), // Outputs
+    .q1(rs2_data),
+
+)
+
+decode_control_mux(
+    .stall(stall), // Inputs - from hazard unit
+    .flush(flush), // Inputs - from decode
+    .alu_op(alu_op), // Inputs - from decode
+    .control_unit_signal(control_unit_signal), // Inputs - from decode
+    .o_alu_op(id_mux_alu_op), // Outputs
+    .o_control_unit_signal(id_mux_control_unit_signal)
+);
+
+forwarding_unit_branch fub(
+    .rs1(rs1), // Input - from decode
+    .rs2(rs2), // Input - from decode
+    .mem_rd(ex_mem_rd), // Input - from ex/mem register
+    .mem_stage_register_write_enable(ex_mem_control_unit_signal[0]), // Input - from ex/mem register
+    .mem_stage_writeback(ex_mem_control_unit_signal[2]), // Input - from ex/mem register
+    .fub_cs_1(fub_cs_1), // Outputs
+    .fub_cs_2(fub_cs_2)
+);
+
+branch_comp_unit bcu(
+    .is_branch(control_unit_signal[5]), // Input - from decode
+    .fub_cs_1(fub_cs_1), // Input - from fowarding unit branch
+    .fub_cs_2(fub_cs_2), // Input - from fowarding unit branch
+    .funct3(funct3), // Input - from decode
+    .rs1(rs1_data), // Input - from register file
+    .rs2(rs2_data), // Input - from register file
+    .alu_out(o_alu_output), // Input - from ex/mem reg
+    .mem_out(o_mem_read_data), // Input - from mem/wb reg
+    .branch_comp(branch_comp) // Output
+);
 
 hazard_unit hazard_detection_unit(
-    .rs1(), // Input - from 
-    .rs2(), // Input - from 
-    .execute_rd(), // Input - from 
-    .mem_rd(), // Input - from 
-    .execute_mem_read(), // Input - from 
-    .mem_mem_read(), // Input - from 
-    .stall() // Output
+    .rs1(rs1), // Input - from decode
+    .rs2(rs2), // Input - from decode
+    .execute_rd(id_ex_o_rd), // Input - from id/ex reg
+    .mem_rd(ex_mem_rd), // Input - from ex/mem reg
+    .execute_mem_read(id_ex_o_control_unit_signal[3]), // Input - from id/ex reg
+    .mem_mem_read(ex_mem_control_unit_signal[3]), // Input - from ex/mem reg
+    .stall(stall) // Output
 );
 
 // ID/EX Register
-decode_execute_reg(.clk(clk), .pc(curr_pc), .rs1(rs1), .rs2(rs2), .rs1_data(q0), .rs2_data(q1), .imm(imm), .rd(rd), .alu_op(o_alu_op), .control_unit_signal(o_control_unit_signal),.o_pc(o_pc), .o_rs1(o_rs1), .o_rs2(o_rs2), .o_rs1_data(o_rs1_data), .o_rs2_data(o_rs2_data), .o_imm(o_imm), .o_rd(o_rd), .o_alu_op(?), .o_control_unit_signal(?));
-
 decode_execute_reg id_ex_reg(
-    .clk(),
-
+    .clk(clk), // Input
+    .rst(rst), // Input
+    .pc(o_pc), // Input - from if/id register
+    .rs1(rs1), // Input - from decode
+    .rs2(rs2), // Input - from decode
+    .rs1_data(rs1_data), // Input - from register file
+    .rs2_data(rs2_data), // Input - from register file
+    .imm(imm), // Input - from decode
+    .rd(rd), // Input - from decode
+    .alu_op(id_mux_alu_op), // Input - from decode control mux
+    .control_unit_signal(id_mux_control_unit_signal), // Input - from decode control mux
+    .o_pc(id_ex_o_pc), // Outputs
+    .o_rs1(id_ex_o_rs1),
+    .o_rs2(id_ex_o_rs2),          
+    .o_rs1_data(id_ex_o_rs1_data),  
+    .o_rs2_data(id_ex_o_rs2_data),   
+    .o_imm(id_ex_o_imm), 
+    .o_rd(id_ex_o_rd), 
+    .o_alu_op(id_ex_o_alu_op), 
+    .o_control_unit_signal(id_ex_o_control_unit_signal) 
 );
 
 // Execute stage modules
 alu_super_mux alu_mux(
-    .rs1_data(o_rs1_data), // Input - from id/ex register
-    .rs2_data(o_rs2_data), // Input - from id/ex register
+    .rs1_data(id_ex_o_rs1_data), // Input - from id/ex register
+    .rs2_data(id_ex_o_rs2_data), // Input - from id/ex register
     .mem_data(o_mem_read_data), // Input - from mem/wb register
     .writeback_data(writeback_data), // Input - from writeback_mux
     .fua_cs_1(fua_cs_1), // Input - from fua
     .fua_cs_2(fua_cs_2), // Input - from fua
-    .imm(?), // Input - from id/ex register
-    .control_unit_signal(?), // Input - from id/ex register
-    .mem_write_data(), // Outputs
+    .imm(id_ex_o_imm), // Input - from id/ex register
+    .control_unit_signal(id_ex_o_control_unit_signal), // Input - from id/ex register
+    .mem_write_data(mem_write_data), // Outputs
     .alu_rs1_data(alu_rs1_data),
     .alu_rs2_data(alu_rs2_data)
 );
@@ -117,8 +223,8 @@ alu alu_module(
 );
 
 execute_control_mux ex_control_mux(
-    .flush(?), // Input - from hazard detection unit
-    .control_unit_signal(?), // Input - from id/ex register
+    .flush(flush), // Input - from hazard detection unit
+    .control_unit_signal(id_ex_o_control_unit_signal), // Input - from id/ex register
     .o_control_unit_signal(ex_o_control_unit_signal) // Output
 );
 
@@ -127,8 +233,8 @@ forwarding_unit_alu fua(
     .mem_we(ex_mem_control_unit_signal), // Input - from ex/mem register
     .writeback_rd(mem_wb_rd), // Input - from mem/wb register
     .writeback(mem_wb_writeback), // Input - from mem/wb register
-    .rs1(?), // Input - from id/ex register
-    .rs2(?), // Input - from id/ex register
+    .rs1(id_ex_o_rs1), // Input - from id/ex register
+    .rs2(id_ex_o_rs2), // Input - from id/ex register
     .fua_cs_1(fua_cs_1), // Outputs cs
     .fua_cs_2(fua_cs_2) // cs
 );

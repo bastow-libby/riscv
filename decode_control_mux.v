@@ -13,7 +13,7 @@ always @ (*) begin
     o_alu_op = alu_op;
     o_control_unit_signal = control_unit_signal;
 
-    if (control_unit_signal[7] == 1'b1 | stall == 1'b1) begin
+    if (control_unit_signal[7] == 1'b1 | stall == 1'b1 | flush == 1'b1) begin
 
         o_alu_op = 4'b0;
         o_control_unit_signal = 8'b0;

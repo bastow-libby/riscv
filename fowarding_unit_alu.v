@@ -14,7 +14,7 @@ always @(*) begin
     fua_cs_1 = 2'b0;
     fua_cs_2 = 2'b0;
 
-    if (mem_register_write_enable[0] == 1'b1) begin
+    if (mem_we[0] == 1'b1) begin
 
         if (mem_rd == rs1)
             fua_cs_1 = 2'b01;
